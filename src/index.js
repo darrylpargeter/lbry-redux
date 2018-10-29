@@ -31,7 +31,7 @@ export {
 } from 'lbryURI';
 
 // actions
-export { doToast, doDismissToast } from 'redux/actions/notifications';
+export { doToast, doDismissToast, doError, doDismissError } from 'redux/actions/notifications';
 
 export {
   doFetchClaimsByChannel,
@@ -97,12 +97,7 @@ export { blacklistReducer } from 'redux/reducers/blacklist';
 // selectors
 export { selectBlackListedOutpoints } from 'redux/selectors/blacklist';
 
-export {
-  selectNotification,
-  selectNotificationProps,
-  selectSnack,
-  selectToast,
-} from 'redux/selectors/notifications';
+export { selectToast, selectError } from 'redux/selectors/notifications';
 
 export {
   makeSelectClaimForUri,

@@ -22,3 +22,18 @@ export function doDismissToast() {
     type: ACTIONS.DISMISS_TOAST,
   };
 }
+
+export function doError(error: string | {}) {
+  return {
+    type: ACTIONS.CREATE_ERROR,
+    data: {
+      error,
+    },
+  };
+}
+
+export function doDismissError() {
+  return {
+    type: ACTIONS.DISMISS_ERROR,
+  };
+}

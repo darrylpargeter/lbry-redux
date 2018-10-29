@@ -13,3 +13,14 @@ export const selectToast = createSelector(selectState, (state) => {
 
   return null;
 });
+
+export const selectError = createSelector(selectState, (state) => {
+  if (state.errors.length) {
+    const { error } = state.errors[0];
+    return {
+      error,
+    };
+  }
+
+  return null;
+});
