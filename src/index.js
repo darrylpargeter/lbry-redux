@@ -1,5 +1,4 @@
 import * as ACTIONS from 'constants/action_types';
-import * as MODALS from 'constants/modal_types';
 import * as THUMBNAIL_STATUSES from 'constants/thumbnail_upload_statuses';
 import * as SEARCH_TYPES from 'constants/search';
 import * as SETTINGS from 'constants/settings';
@@ -12,19 +11,10 @@ import Lbryapi from 'lbryapi';
 import { selectState as selectSearchState } from 'redux/selectors/search';
 
 // types
-export { Notification } from 'types/Notification';
+export { Toast } from 'types/notification';
 
 // constants
-export {
-  ACTIONS,
-  MODALS,
-  THUMBNAIL_STATUSES,
-  SEARCH_TYPES,
-  SETTINGS,
-  TRANSACTIONS,
-  SORT_OPTIONS,
-  PAGES,
-};
+export { ACTIONS, THUMBNAIL_STATUSES, SEARCH_TYPES, SETTINGS, TRANSACTIONS, SORT_OPTIONS, PAGES };
 
 // common
 export { Lbry, Lbryapi };
@@ -41,7 +31,7 @@ export {
 } from 'lbryURI';
 
 // actions
-export { doNotify, doHideNotification } from 'redux/actions/notifications';
+export { doToast, doDismissToast } from 'redux/actions/notifications';
 
 export {
   doFetchClaimsByChannel,
@@ -111,6 +101,7 @@ export {
   selectNotification,
   selectNotificationProps,
   selectSnack,
+  selectToast,
 } from 'redux/selectors/notifications';
 
 export {

@@ -1,20 +1,24 @@
 // @flow
 import * as ACTIONS from 'constants/action_types';
-import type { Notification, NotificationProps } from 'types/Notification';
+import type { ToastParams } from 'types/notification';
+import uuid from 'uuid/v4';
 
-export function doNotify(notification: Notification, notificationProps: NotificationProps) {
+export function doToast(params: ToastParams) {
+  if (!params) {
+    throw Error("'params' object is required to create a toast notification");
+  }
+
   return {
-    type: ACTIONS.CREATE_NOTIFICATION,
+    type: ACTIONS.CREATE_TOAST,
     data: {
-      notification,
-      // using this syntax to create an object if notificationProps is undefined
-      notificationProps: { ...notificationProps },
+      id: uuid(),
+      params,
     },
   };
 }
 
-export function doHideNotification() {
+export function doDismissToast() {
   return {
-    type: ACTIONS.DISMISS_NOTIFICATION,
+    type: ACTIONS.DISMISS_TOAST,
   };
 }

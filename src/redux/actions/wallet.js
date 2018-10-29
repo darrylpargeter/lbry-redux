@@ -1,6 +1,6 @@
 import * as ACTIONS from 'constants/action_types';
 import Lbry from 'lbry';
-import { doNotify } from 'redux/actions/notifications';
+import { doToast } from 'redux/actions/notifications';
 import { selectBalance } from 'redux/selectors/wallet';
 import { creditsToString } from 'util/formatCredits';
 
@@ -9,7 +9,7 @@ export function doUpdateBalance() {
     const {
       wallet: { balance: balanceInStore },
     } = getState();
-    Lbry.account_balance().then(balance => {
+    Lbry.account_balance().then((balance) => {
       if (balanceInStore !== balance) {
         dispatch({
           type: ACTIONS.UPDATE_BALANCE,
@@ -23,19 +23,19 @@ export function doUpdateBalance() {
 }
 
 export function doBalanceSubscribe() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(doUpdateBalance());
     setInterval(() => dispatch(doUpdateBalance()), 5000);
   };
 }
 
 export function doFetchTransactions() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
       type: ACTIONS.FETCH_TRANSACTIONS_STARTED,
     });
 
-    Lbry.transaction_list().then(results => {
+    Lbry.transaction_list().then((results) => {
       dispatch({
         type: ACTIONS.FETCH_TRANSACTIONS_COMPLETED,
         data: {
@@ -47,8 +47,8 @@ export function doFetchTransactions() {
 }
 
 export function doFetchBlock(height) {
-  return dispatch => {
-    Lbry.block_show({ height }).then(block => {
+  return (dispatch) => {
+    Lbry.block_show({ height }).then((block) => {
       dispatch({
         type: ACTIONS.FETCH_BLOCK_SUCCESS,
         data: { block },
@@ -58,13 +58,13 @@ export function doFetchBlock(height) {
 }
 
 export function doGetNewAddress() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
       type: ACTIONS.GET_NEW_ADDRESS_STARTED,
     });
 
     // Removed localStorage use, since address is expected to be stored in redux store
-    Lbry.address_unused().then(address => {
+    Lbry.address_unused().then((address) => {
       dispatch({
         type: ACTIONS.GET_NEW_ADDRESS_COMPLETED,
         data: { address },
@@ -74,12 +74,12 @@ export function doGetNewAddress() {
 }
 
 export function doCheckAddressIsMine(address) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
       type: ACTIONS.CHECK_ADDRESS_IS_MINE_STARTED,
     });
 
-    Lbry.address_is_mine({ address }).then(isMine => {
+    Lbry.address_is_mine({ address }).then((isMine) => {
       if (!isMine) dispatch(doGetNewAddress());
 
       dispatch({
@@ -96,11 +96,9 @@ export function doSendDraftTransaction(address, amount) {
 
     if (balance - amount <= 0) {
       dispatch(
-        doNotify({
+        doToast({
           title: 'Insufficient credits',
           message: 'Insufficient credits',
-          type: 'error',
-          displayType: ['modal', 'toast'],
         })
       );
       return;
@@ -110,17 +108,14 @@ export function doSendDraftTransaction(address, amount) {
       type: ACTIONS.SEND_TRANSACTION_STARTED,
     });
 
-    const successCallback = response => {
+    const successCallback = (response) => {
       if (response.txid) {
         dispatch({
           type: ACTIONS.SEND_TRANSACTION_COMPLETED,
         });
         dispatch(
-          doNotify({
-            title: 'Credits sent',
+          doToast({
             message: `You sent ${amount} LBC`,
-            type: 'error',
-            displayType: ['snackbar', 'toast'],
             linkText: 'History',
             linkTarget: '/wallet',
           })
@@ -131,27 +126,23 @@ export function doSendDraftTransaction(address, amount) {
           data: { error: response },
         });
         dispatch(
-          doNotify({
-            title: 'Transaction failed',
+          doToast({
             message: 'Transaction failed',
-            type: 'error',
-            displayType: ['snackbar', 'toast'],
+            isError: true,
           })
         );
       }
     };
 
-    const errorCallback = error => {
+    const errorCallback = (error) => {
       dispatch({
         type: ACTIONS.SEND_TRANSACTION_FAILED,
         data: { error: error.message },
       });
       dispatch(
-        doNotify({
-          title: 'Transaction failed',
+        doToast({
           message: 'Transaction failed',
-          type: 'error',
-          displayType: ['snackbar', 'toast'],
+          isError: true,
         })
       );
     };
@@ -184,11 +175,9 @@ export function doSendTip(amount, claimId, uri, successCallback, errorCallback) 
 
     if (balance - amount <= 0) {
       dispatch(
-        doNotify({
-          title: 'Insufficient credits',
+        doToast({
           message: 'Insufficient credits',
-          type: 'error',
-          displayType: ['modal', 'toast'],
+          isError: true,
         })
       );
       return;
@@ -196,11 +185,10 @@ export function doSendTip(amount, claimId, uri, successCallback, errorCallback) 
 
     const success = () => {
       dispatch(
-        doNotify({
+        doToast({
           message: __(`You sent ${amount} LBC as a tip, Mahalo!`),
           linkText: __('History'),
           linkTarget: __('/wallet'),
-          displayType: ['snackbar'],
         })
       );
 
@@ -213,11 +201,11 @@ export function doSendTip(amount, claimId, uri, successCallback, errorCallback) 
       }
     };
 
-    const error = err => {
+    const error = (err) => {
       dispatch(
-        doNotify({
+        doToast({
           message: __(`There was an error sending support funds.`),
-          displayType: ['snackbar'],
+          isError: true,
         })
       );
 
@@ -245,12 +233,12 @@ export function doSendTip(amount, claimId, uri, successCallback, errorCallback) 
 }
 
 export function doWalletEncrypt(newPassword) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
       type: ACTIONS.WALLET_ENCRYPT_START,
     });
 
-    Lbry.account_encrypt({ new_password: newPassword }).then(result => {
+    Lbry.account_encrypt({ new_password: newPassword }).then((result) => {
       if (result === true) {
         dispatch({
           type: ACTIONS.WALLET_ENCRYPT_COMPLETED,
@@ -267,12 +255,12 @@ export function doWalletEncrypt(newPassword) {
 }
 
 export function doWalletUnlock(password) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
       type: ACTIONS.WALLET_UNLOCK_START,
     });
 
-    Lbry.account_unlock({ password }).then(result => {
+    Lbry.account_unlock({ password }).then((result) => {
       if (result === true) {
         dispatch({
           type: ACTIONS.WALLET_UNLOCK_COMPLETED,
@@ -289,12 +277,12 @@ export function doWalletUnlock(password) {
 }
 
 export function doWalletLock() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
       type: ACTIONS.WALLET_LOCK_START,
     });
 
-    Lbry.wallet_lock().then(result => {
+    Lbry.wallet_lock().then((result) => {
       if (result === true) {
         dispatch({
           type: ACTIONS.WALLET_LOCK_COMPLETED,
@@ -311,12 +299,12 @@ export function doWalletLock() {
 }
 
 export function doWalletDecrypt() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
       type: ACTIONS.WALLET_DECRYPT_START,
     });
 
-    Lbry.account_decrypt().then(result => {
+    Lbry.account_decrypt().then((result) => {
       if (result === true) {
         dispatch({
           type: ACTIONS.WALLET_DECRYPT_COMPLETED,
@@ -333,12 +321,12 @@ export function doWalletDecrypt() {
 }
 
 export function doWalletStatus() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
       type: ACTIONS.WALLET_STATUS_START,
     });
 
-    Lbry.status().then(status => {
+    Lbry.status().then((status) => {
       if (status && status.wallet) {
         dispatch({
           type: ACTIONS.WALLET_STATUS_COMPLETED,
